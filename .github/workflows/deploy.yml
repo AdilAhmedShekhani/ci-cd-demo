@@ -1,0 +1,69 @@
+name: Multi-Branch Deployment
+
+on:
+  push:
+    branches: [main, dev] # sirf main aur dev branch par chalega
+  pull_request:
+    branches: [main, dev] # PR banate hi chalega
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Lint (Skip if ESLint not setup)
+        run: npx eslint . || echo "No lint config found, skipping"
+
+      - name: Test
+        run: npm test
+
+      - name: Build (Optional)
+        run: echo "Simulating build step" && mkdir build && echo "Build complete" > build/output.txt
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-folder
+          path: build/
+
+  deploy_qa:
+    needs: ci
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-folder
+          path: ./build
+
+      - name: Deploy to QA
+        run: echo "🚀 Deploying to QA environment using build folder"
+
+  deploy_prod:
+    needs: ci
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-folder
+          path: ./build
+
+      - name: Deploy to Production
+        run: echo "🚀 Deploying to Production environment using build folder"
+
+      - name: Notify Team
+        run: echo "✅ Production deploy complete. Notify on Slack!"

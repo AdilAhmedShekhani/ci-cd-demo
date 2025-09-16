@@ -1,4 +1,4 @@
-name: CI-CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,40 +6,38 @@ on:
       - main
       - dev
   pull_request:
-    branches:
-      - "*"
 
 jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm install
 
-      - name: Lint and Test
-        run: |
-          echo "🔍 Running lint & tests..."
-          npm test || echo "No tests yet"
+      - name: Fix Jest permissions
+        run: chmod +x ./node_modules/.bin/jest
 
-      - name: Create Artifact
-        run: |
-          echo "📦 Build artifact create kar rahe hain..."
-          mkdir -p artifact
-          echo "Build successful!" > artifact/report.txt
+      - name: Run Lint
+        run: npm run lint
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+      - name: Run Tests
+        run: npm test
+
+      - name: Upload build artifact
+        run: echo "Artifact created" > build.txt
+
+      - uses: actions/upload-artifact@v3
         with:
-          name: build-report
-          path: artifact/
+          name: build-artifact
+          path: build.txt
 
   deploy_qa:
     needs: ci
@@ -49,19 +47,13 @@ jobs:
       group: deploy-${{ github.ref }}
       cancel-in-progress: true
     steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v3
         with:
-          name: build-report
-
-      - name: Debug - Show Files
-        run: ls -R
+          name: build-artifact
 
       - name: Deploy to QA
-        run: |
-          echo "🚀 Deploying to QA environment..."
-          cat report.txt || echo "⚠ report.txt file not found!"
-          echo "✅ QA Deployment Successful!"
+        run: echo "🚀 Deploying to QA environment..."
 
   deploy_prod:
     needs: ci
@@ -71,13 +63,10 @@ jobs:
       group: deploy-${{ github.ref }}
       cancel-in-progress: true
     steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v3
         with:
-          name: build-report
+          name: build-artifact
 
       - name: Deploy to Production
-        run: |
-          echo "🚀 Deploying to Production environment..."
-          cat build-report/report.txt
-          echo "🎉 Production Deployment Successful!"
+        run: echo "🚀 Deploying to Production environment..."

@@ -54,10 +54,13 @@ jobs:
         with:
           name: build-report
 
+      - name: Debug - Show Files
+        run: ls -R
+
       - name: Deploy to QA
         run: |
           echo "🚀 Deploying to QA environment..."
-          cat build-report/report.txt
+          cat report.txt || echo "⚠ report.txt file not found!"
           echo "✅ QA Deployment Successful!"
 
   deploy_prod:

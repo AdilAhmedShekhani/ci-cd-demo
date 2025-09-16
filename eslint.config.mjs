@@ -1,13 +1,22 @@
-module.exports = {
-  env: {
-    browser: true,
-    node: true,
-    es2021: true,
-    jest: true, // ✅ Add this line
+// eslint.config.mjs
+export default [
+  {
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        browser: true,
+        node: true,
+      },
+    },
   },
-  extends: ["eslint:recommended"],
-  parserOptions: {
-    ecmaVersion: "latest",
+  {
+    files: ["**/*.test.js"],
+    languageOptions: {
+      globals: {
+        test: true,
+        expect: true,
+      },
+    },
   },
-  rules: {},
-};
+];

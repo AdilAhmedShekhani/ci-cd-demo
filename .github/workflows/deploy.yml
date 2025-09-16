@@ -31,10 +31,10 @@ jobs:
 
       - name: Create Artifact
         run: |
-          echo "Build artifact create kar rahe hain..."
+          echo "📦 Build artifact create kar rahe hain..."
           mkdir -p artifact
           echo "Build successful!" > artifact/report.txt
-        # Artifact upload kar rahe hain
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -58,6 +58,7 @@ jobs:
         run: |
           echo "🚀 Deploying to QA environment..."
           cat build-report/report.txt
+          echo "✅ QA Deployment Successful!"
 
   deploy_prod:
     needs: ci
@@ -76,3 +77,4 @@ jobs:
         run: |
           echo "🚀 Deploying to Production environment..."
           cat build-report/report.txt
+          echo "🎉 Production Deployment Successful!"

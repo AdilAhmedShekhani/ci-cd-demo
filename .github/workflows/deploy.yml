@@ -22,6 +22,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Fix ESLint permissions
+        run: chmod +x ./node_modules/.bin/eslint
+
       - name: Fix Jest permissions
         run: chmod +x ./node_modules/.bin/jest
 
@@ -34,7 +37,8 @@ jobs:
       - name: Upload build artifact
         run: echo "Artifact created" > build.txt
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifact
           path: build.txt

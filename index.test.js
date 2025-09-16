@@ -1,8 +1,8 @@
 // index.test.js
 
 // Simple addition function for testing
-function add(a, b) {
-  return a + b;
+function add(x, y) {
+  return x + y;
 }
 
 // Jest test case
